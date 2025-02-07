@@ -1,24 +1,35 @@
 pipeline {
     agent any
+
     environment {
-        PATH = "$PATH:/usr/share/maven/bin"
+        M2_HOME = "/usr/share/maven" // Update this if needed
+        PATH = "$M2_HOME/bin:$PATH"
     }
+
     stages {
-        stage('GetCode') {
+        stage('Checkout Code') {
             steps {
-                git branch: 'main', changelog: false, poll: false, url: 'https://github.com/nimbuswiztech/maven_webapp.git'
+                git branch: 'main', url: 'https://github.com/nimbuswiztech/maven_webapp.git'
             }
-        }        
-        stage('Build') {
+        }
+
+        stage('Build with Maven') {
             steps {
                 sh 'mvn clean package'
             }
         }
+
+        stage('Run Unit Tests') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        
         stage('Deploy') {
             steps {
                 sshagent(['tomcat']) {
-                    sh 'scp -o StrictHostKeyChecking=no target/demo.war ubuntu@34.229.15.246:/home/ubuntu/'
-                    sh 'ssh ubuntu@34.229.15.246 "sudo mv /home/ubuntu/demo.war /opt/tomcat/webapps/"'
+                    sh 'scp -o StrictHostKeyChecking=no target/demo.war ubuntu@34.238.121.177:/home/ubuntu/'
+                    sh 'ssh ubuntu@34.238.121.177 "sudo mv /home/ubuntu/demo.war /opt/tomcat/webapps/"'
                 }
             }
         }
