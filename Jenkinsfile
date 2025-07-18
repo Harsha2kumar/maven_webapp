@@ -24,6 +24,14 @@ pipeline {
                 sh 'mvn test'
             }
         }
+
+        stage('Approval') {
+            steps {
+                script {
+                    input message: 'Do you approve deployment to production?', ok: 'Approve'
+                }
+            }
+        }
         
         stage('Deploy') {
             steps {
