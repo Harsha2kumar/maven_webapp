@@ -24,12 +24,20 @@ pipeline {
                 sh 'mvn test'
             }
         }
+
+        stage('Approval') {
+            steps {
+                script {
+                    input message: 'Do you approve deployment to production?', ok: 'Approve'
+                }
+            }
+        }
         
         stage('Deploy') {
             steps {
                 sshagent(['tomcat']) {
-                    sh 'scp -o StrictHostKeyChecking=no target/demo.war ubuntu@34.238.121.177:/home/ubuntu/'
-                    sh 'ssh ubuntu@34.238.121.177 "sudo mv /home/ubuntu/demo.war /opt/tomcat/webapps/"'
+                    sh 'scp -o StrictHostKeyChecking=no target/demo.war ubuntu@3.92.175.176:/home/ubuntu/'
+                    sh 'ssh ubuntu@3.92.175.176 "sudo mv /home/ubuntu/demo.war /opt/tomcat/webapps/"'
                 }
             }
         }
